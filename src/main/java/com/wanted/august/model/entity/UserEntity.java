@@ -8,7 +8,7 @@ import com.wanted.august.model.request.UserJoinRequest;
 import lombok.*;
 import org.hibernate.annotations.Where;
 
-@Getter
+@Data
 @Entity
 @Builder
 @Table(name = "user")
