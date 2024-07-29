@@ -1,11 +1,17 @@
 package com.wanted.august.service;
 
+import com.wanted.august.exception.AugustApplicationException;
+import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.User;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.UserJoinRequest;
+import com.wanted.august.model.request.UserLoginRequest;
 import com.wanted.august.repository.UserRepository;
+import com.wanted.august.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -14,11 +20,31 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.token.expired-time-ms}")
+    private Long expiredTimeMs;
 
     // 회원가입
     @Override
     public User join(UserJoinRequest request) {
         UserEntity saved = userRepository.save(UserEntity.toEntity(request));
         return User.fromEntity(saved);
+    }
+
+    @Override
+    public String login(UserLoginRequest request) {
+        User savedUser = loadUserByUsername(request.getUserName());
+
+        // TODO 비밀번호 비교
+//        if (!encoder.matches(password, savedUser.getPassword())) {
+//            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
+//        }
+        return JwtTokenUtil.generateAccessToken(savedUser.getUsername(), secretKey, expiredTimeMs);
+    }
+
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        return User.fromEntity(userRepository.findByUserName(username).orElseThrow(() -> new AugustApplicationException(ErrorCode.USER_NOT_FOUND)));
     }
 }

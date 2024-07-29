@@ -18,3 +18,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 logging.level:
   org.hibernate.SQL: debug
+
+jwt:
+  secret-key: wanted-august.simple_project_2024_secret_key
+  # 30 days
+  token.expired-time-ms: 2592000000

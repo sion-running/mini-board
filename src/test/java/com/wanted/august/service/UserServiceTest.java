@@ -50,4 +50,8 @@ public class UserServiceTest {
         assertThat(actual.getPhone()).isEqualTo(request.getPhone());
     }
 
+    @Test
+    void 존재하지_않는_유저_에러발생() {
+
+    }
 }

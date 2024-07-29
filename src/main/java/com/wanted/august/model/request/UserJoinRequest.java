@@ -2,7 +2,6 @@ package com.wanted.august.model.request;
 
 import com.wanted.august.model.UserRole;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
