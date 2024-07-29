@@ -1,11 +1,8 @@
 package com.wanted.august.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wanted.august.model.UserRole;
-import com.wanted.august.model.entity.BaseEntity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,16 +11,19 @@ import org.hibernate.annotations.Where;
 
 @Data
 @Entity
+@Table(name = "user")
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = "deleted_at is NULL")
-public class User extends BaseEntity {
+public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userName;
+
+    private String writer;
 
     private String password;
 
