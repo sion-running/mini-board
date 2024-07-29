@@ -5,13 +5,10 @@ import com.wanted.august.model.UserRole;
 import javax.persistence.*;
 
 import com.wanted.august.model.request.UserJoinRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
-@Data
+@Getter
 @Entity
 @Builder
 @Table(name = "user")

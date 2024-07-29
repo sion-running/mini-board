@@ -2,13 +2,14 @@ package com.wanted.august.model.request;
 
 import com.wanted.august.model.UserRole;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserJoinRequest {

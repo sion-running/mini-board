@@ -12,6 +12,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Invalid password"),
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "System error occurred"),
+    DUPLICATE_USER_NAME(HttpStatus.CONFLICT, "Duplicate user name"),
+
     ;
 
     private final HttpStatus status;

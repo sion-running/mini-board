@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -26,9 +28,15 @@ public class UserServiceImpl implements UserService {
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
 
+
     // 회원가입
     @Override
     public User join(UserJoinRequest request) {
+        userRepository.findByUserName(request.getUserName()).ifPresent(it -> {
+            throw new AugustApplicationException(ErrorCode.DUPLICATE_USER_NAME);
+        });
+
+        request.setPassword(encoder.encode(request.getPassword()));
         UserEntity saved = userRepository.save(UserEntity.toEntity(request));
         return User.fromEntity(saved);
     }
