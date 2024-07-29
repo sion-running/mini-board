@@ -4,13 +4,16 @@ import com.wanted.august.model.UserRole;
 
 import javax.persistence.*;
 
+import com.wanted.august.model.request.UserJoinRequest;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 @Data
 @Entity
+@Builder
 @Table(name = "user")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,4 +36,14 @@ public class UserEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
+
+    public static UserEntity toEntity(UserJoinRequest request) {
+        return UserEntity.builder()
+                .userName(request.getUserName())
+                .writer(request.getWriter())
+                .password(request.getPassword())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .build();
+    }
 }
