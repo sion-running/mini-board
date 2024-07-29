@@ -1,16 +1,22 @@
 package com.wanted.august.service;
 
+import com.wanted.august.exception.AugustApplicationException;
+import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.User;
 import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.UserJoinRequest;
 import com.wanted.august.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.when;
@@ -51,7 +57,28 @@ public class UserServiceTest {
     }
 
     @Test
-    void 존재하지_않는_유저_에러발생() {
+    void 회원가입시_중복된_유저네임이면_에러발생() {
+        // given
+        String userName = "sion1234";
+        String writer = "sion";
+        String password = "paSS123!@#";
+        String email = "sion@naver.com";
+        String phone = "010-1111-2222";
 
+        UserJoinRequest request = new UserJoinRequest(
+                userName,
+                writer,
+                password,
+                email,
+                phone,
+                UserRole.USER
+        );
+
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(new UserEntity()));
+        AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class,
+                () -> userService.join(request));
+        Assertions.assertEquals(ErrorCode.DUPLICATE_USER_NAME, exception.getErrorCode());
     }
+
+
 }

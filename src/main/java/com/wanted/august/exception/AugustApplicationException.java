@@ -1,5 +1,10 @@
 package com.wanted.august.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class AugustApplicationException extends RuntimeException {
     private ErrorCode errorCode;
     private String desc;
