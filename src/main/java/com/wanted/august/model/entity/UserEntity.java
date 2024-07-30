@@ -24,7 +24,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "user_name", unique = true)
     private String userName;
 
-    private String writer;
+    private String nickName; // 작성자명 대체
 
     private String password;
 
@@ -38,10 +38,11 @@ public class UserEntity extends BaseEntity {
     public static UserEntity toEntity(UserJoinRequest request) {
         return UserEntity.builder()
                 .userName(request.getUserName())
-                .writer(request.getWriter())
+                .nickName(request.getNickName())
                 .password(request.getPassword())
                 .email(request.getEmail())
                 .phone(request.getPhone())
+                .role(request.getRole())
                 .build();
     }
 }

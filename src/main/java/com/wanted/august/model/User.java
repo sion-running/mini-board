@@ -32,7 +32,7 @@ public class User implements UserDetails {
         return User.builder()
                 .id(userEntity.getId())
                 .username(userEntity.getUserName())
-                .writer(userEntity.getWriter())
+                .writer(userEntity.getNickName())
                 .password(userEntity.getPassword())
                 .email(userEntity.getEmail())
                 .phone(userEntity.getPhone())

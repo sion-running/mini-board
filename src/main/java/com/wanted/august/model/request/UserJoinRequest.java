@@ -3,7 +3,6 @@ package com.wanted.august.model.request;
 import com.wanted.august.model.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
@@ -22,7 +21,7 @@ public class UserJoinRequest {
     @Pattern(
             regexp = "^[a-zA-Z가-힣]+$",
             message = "영어 대소문자 혹은 한글 이름을 사용")
-    private String writer;
+    private String nickName;
 
     @Pattern(
             regexp = "^(?:(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;\"'<>,.?~\\\\/-])(?=.{7,})|(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;\"'<>,.?~\\\\/-])(?=.{7,})|(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;\"'<>,.?~\\\\/-])(?=.{7,})).*$",
@@ -37,5 +36,5 @@ public class UserJoinRequest {
             message = "Invalid phone number format")
     private String phone;
 
-    private UserRole role;
+    private UserRole role = UserRole.USER;
 }
