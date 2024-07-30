@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wanted.august.model.entity.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,12 +14,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 public class User implements UserDetails {
 
     private Long id;
     private String username;
-    private String writer;
+    private String nickName;
     private String password;
     private String email;
     private String phone;
@@ -32,10 +34,13 @@ public class User implements UserDetails {
         return User.builder()
                 .id(userEntity.getId())
                 .username(userEntity.getUserName())
-                .writer(userEntity.getNickName())
-                .password(userEntity.getPassword())
+                .nickName(userEntity.getNickName())
                 .email(userEntity.getEmail())
                 .phone(userEntity.getPhone())
+                .role(userEntity.getRole())
+                .createdAt(userEntity.getCreatedAt())
+                .updatedAt(userEntity.getUpdatedAt())
+                .deletedAt(userEntity.getDeletedAt())
                 .build();
     }
 

@@ -46,14 +46,14 @@ public class UserServiceTest {
     @Test
     void 회원가입_성공후_User_반환() {
         String userName = "sion1234";
-        String writer = "sion";
+        String nickName = "sion";
         String password = "paSS123!@#";
         String email = "sion@naver.com";
         String phone = "010-1111-2222";
 
         UserJoinRequest request = new UserJoinRequest(
                 userName,
-                writer,
+                nickName,
                 password,
                 email,
                 phone,
@@ -73,14 +73,14 @@ public class UserServiceTest {
     void 회원가입시_중복된_유저네임이면_에러발생() {
         // given
         String userName = "sion1234";
-        String writer = "sion";
+        String nickName = "sion";
         String password = "paSS123!@#";
         String email = "sion@naver.com";
         String phone = "010-1111-2222";
 
         UserJoinRequest request = new UserJoinRequest(
                 userName,
-                writer,
+                nickName,
                 password,
                 email,
                 phone,
@@ -97,14 +97,14 @@ public class UserServiceTest {
     void 회원가입시_패스워드는_암호화되어_저장된다() {
         // given
         String userName = "sion1234";
-        String writer = "sion";
+        String nickName = "sion";
         String password = "paSS123!@#";
         String email = "sion@naver.com";
         String phone = "010-1111-2222";
 
         UserJoinRequest request = new UserJoinRequest(
                 userName,
-                writer,
+                nickName,
                 password,
                 email,
                 phone,

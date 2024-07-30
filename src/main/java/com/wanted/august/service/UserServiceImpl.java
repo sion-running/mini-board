@@ -17,17 +17,17 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-
-    @Value("${jwt.token.expired-time-ms}")
-    private Long expiredTimeMs;
-
+    public UserServiceImpl(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
+        this.userRepository = userRepository;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.encoder = new BCryptPasswordEncoder();
+    }
 
     // 회원가입
     @Override
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
             throw new AugustApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return JwtTokenUtil.generateAccessToken(savedUser.getUsername(), secretKey, expiredTimeMs);
+        return jwtTokenUtil.generateAccessToken(savedUser.getUsername());
     }
 
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
