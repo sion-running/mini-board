@@ -6,7 +6,9 @@ import com.wanted.august.model.User;
 import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.UserJoinRequest;
+import com.wanted.august.model.request.UserLoginRequest;
 import com.wanted.august.repository.UserRepository;
+import com.wanted.august.utils.JwtTokenUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,9 @@ public class UserServiceTest {
 
     @Mock
     BCryptPasswordEncoder encoder;
+
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
 
     @Test
     void 회원가입_성공후_User_반환() {
@@ -122,5 +127,65 @@ public class UserServiceTest {
 
         UserEntity savedUser = userCaptor.getValue();
         Assertions.assertEquals("encryptedPassword", savedUser.getPassword());
+    }
+
+    @Test
+    void 로그인시_패스워드_불일치하면_에러발생() {
+        // given
+        String userName = "sion1234";
+        String password = "paSS123!@#";
+        String loginPassword = "password1"; // 로그인 시 입력한 패스워드
+        String encryptedPassword = "encryptedPassword"; // 암호화된 패스워드
+
+        UserLoginRequest request = new UserLoginRequest(
+            userName, loginPassword
+        );
+
+        UserEntity entity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password(encryptedPassword)
+                .build();
+
+        // when
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(entity));
+        when(encoder.matches(loginPassword, entity.getPassword())).thenReturn(false);
+
+        AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class
+                , () -> userService.login(request));
+
+        // then
+        Assertions.assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
+    }
+
+    // TODO static 메소드 모킹
+    @Test
+    void 로그인에_성공하면_토큰을_반환한다() {
+        // given
+        String userName = "sion1234";
+        String loginPassword = "password1"; // 로그인 시 입력한 패스워드
+        String encryptedPassword = "encryptedPassword"; // 암호화된 패스워드
+        String expectedToken = "dummyToken";
+
+        UserLoginRequest request = new UserLoginRequest(
+                userName, loginPassword
+        );
+
+        UserEntity entity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password(encryptedPassword)
+                .build();
+
+
+        // Mocking
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(entity));
+        when(encoder.matches(loginPassword, encryptedPassword)).thenReturn(true); // 패스워드 일치
+
+        // when
+        String token = userService.login(request);
+
+        // then
+        assertThat(token).isNotBlank();
     }
 }

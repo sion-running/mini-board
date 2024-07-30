@@ -45,10 +45,11 @@ public class UserServiceImpl implements UserService {
     public String login(UserLoginRequest request) {
         User savedUser = loadUserByUsername(request.getUserName());
 
-        // TODO 비밀번호 비교
-//        if (!encoder.matches(password, savedUser.getPassword())) {
-//            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
-//        }
+        // 비밀번호 비교
+        if (!encoder.matches(request.getPassword(), savedUser.getPassword())) {
+            throw new AugustApplicationException(ErrorCode.INVALID_PASSWORD);
+        }
+
         return JwtTokenUtil.generateAccessToken(savedUser.getUsername(), secretKey, expiredTimeMs);
     }
 
