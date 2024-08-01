@@ -13,7 +13,8 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Invalid password"),
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "System error occurred"),
     DUPLICATE_USER_NAME(HttpStatus.CONFLICT, "Duplicate user name"),
-
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
+    INVALID_POST_WRITER(HttpStatus.NOT_FOUND, "Invalid post writer"),
     ;
 
     private final HttpStatus status;

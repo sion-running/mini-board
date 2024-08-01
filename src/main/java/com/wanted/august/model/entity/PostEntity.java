@@ -2,16 +2,13 @@ package com.wanted.august.model.entity;
 
 import com.wanted.august.model.User;
 import com.wanted.august.model.request.PostCreateRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
-@Getter
+@Data
 @Builder
 @Table(name = "post")
 @Entity
