@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,15 @@ public class PostServiceImpl implements PostService {
         postEntity.setTitle(request.getTitle());
         postEntity.setContent(request.getContent());
         postRepository.save(postEntity);
+    }
+
+    @Override
+    public List<Post> findAllByOrderCreatedAt(String direction) {
+        if (direction.equals("ASC")) {
+            return postRepository.findAllByOrderByCreatedAtAsc().stream().map(Post::fromEntity).collect(Collectors.toList());
+        }
+
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(Post::fromEntity).collect(Collectors.toList());
     }
 
     private long getDaysSincePostCreated(PostEntity entity) {

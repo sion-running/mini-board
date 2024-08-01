@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Where(clause = "deleted_at is NULL")
 @SQLDelete(sql = "UPDATE #{#entityName} SET deleted_at = NOW() WHERE id = ?")
+@EntityListeners(AuditingEntityListener.class)
 public class PostEntity {
 
     @Id
@@ -43,7 +45,7 @@ public class PostEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(columnDefinition = "datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '수정일자'")
+    @Column(columnDefinition = "datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자'")
     private LocalDateTime updatedAt;
 
     @Column(columnDefinition = "datetime default NULL COMMENT '삭제일자'")
