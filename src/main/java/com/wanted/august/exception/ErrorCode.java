@@ -15,6 +15,7 @@ public enum ErrorCode {
     DUPLICATE_USER_NAME(HttpStatus.CONFLICT, "Duplicate user name"),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     INVALID_POST_WRITER(HttpStatus.NOT_FOUND, "Invalid post writer"),
+    POST_UPDATE_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "Update period expired"),
     ;
 
     private final HttpStatus status;

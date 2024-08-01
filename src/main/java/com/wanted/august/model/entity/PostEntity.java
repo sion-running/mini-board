@@ -3,10 +3,14 @@ package com.wanted.august.model.entity;
 import com.wanted.august.model.User;
 import com.wanted.august.model.request.PostCreateRequest;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,7 +19,8 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = "deleted_at is NULL")
-public class PostEntity extends BaseEntity {
+@SQLDelete(sql = "UPDATE #{#entityName} SET deleted_at = NOW() WHERE id = ?")
+public class PostEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +37,17 @@ public class PostEntity extends BaseEntity {
     @Column(length = 1000, nullable = false)
     @Size(max = 1000)
     private String content;
+
+    @CreatedDate
+    @Column(updatable = false, columnDefinition = "datetime default CURRENT_TIMESTAMP NOT NULL COMMENT '생성일자'")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(columnDefinition = "datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '수정일자'")
+    private LocalDateTime updatedAt;
+
+    @Column(columnDefinition = "datetime default NULL COMMENT '삭제일자'")
+    private LocalDateTime deletedAt;
 
     public static PostEntity toEntity(PostCreateRequest request, UserEntity user) {
         return PostEntity.builder()

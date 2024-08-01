@@ -16,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,6 +106,35 @@ public class PostServiceTest {
     }
 
     @Test
+    void 포스트_생성후_10일이_지나면_수정불가_예외를_발생시킨다() {
+        // given
+        String userName = "sion1234";
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostUpdateRequest request = PostUpdateRequest.builder()
+                .postId(1L)
+                .title("포스트 제목1")
+                .content("포스트 내용")
+                .build();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime twentyDaysAgo = now.minus(11, ChronoUnit.DAYS); // 현재기준 20일 전을 생성일로 설정
+        PostEntity entity = PostEntity.builder().id(1L).createdAt(twentyDaysAgo).build();
+
+        when(userService.findByUserNameOrElseThrow(userName)).thenReturn(userEntity);
+        when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(entity));
+
+        // then
+        AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
+                postService.update(request, userName));
+        Assertions.assertEquals(ErrorCode.POST_UPDATE_PERIOD_EXPIRED, exception.getErrorCode());
+    }
+
+    @Test
     void 포스트_수정시_작성자와_로그인_유저가_다르면_에러발생() {
         // given
         String postWriter = "sion1234";
@@ -135,7 +167,6 @@ public class PostServiceTest {
                 postService.update(request, loggedInUser));
         Assertions.assertEquals(ErrorCode.INVALID_POST_WRITER, exception.getErrorCode());
     }
-
 }
 
 

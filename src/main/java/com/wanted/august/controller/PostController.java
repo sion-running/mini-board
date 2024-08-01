@@ -27,7 +27,7 @@ public class PostController {
         return Response.success(post);
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public Response<Post> update(@Valid @RequestBody PostUpdateRequest request, Authentication authentication) {
         postService.update(request, authentication.getName());
         return Response.success();
