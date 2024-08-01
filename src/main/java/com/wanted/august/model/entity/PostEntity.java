@@ -1,5 +1,7 @@
 package com.wanted.august.model.entity;
 
+import com.wanted.august.model.User;
+import com.wanted.august.model.request.PostCreateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,4 +36,13 @@ public class PostEntity extends BaseEntity {
     @Size(max = 1000)
     private String content;
 
+    public static PostEntity toEntity(PostCreateRequest request, UserEntity user) {
+        return PostEntity.builder()
+                .user(user)
+                .title(request.getTitle())
+                .user(user)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .build();
+    }
 }

@@ -1,6 +1,10 @@
 package com.wanted.august.controller;
 
+import com.wanted.august.model.Post;
 import com.wanted.august.model.request.PostCreateRequest;
+import com.wanted.august.model.response.Response;
+import com.wanted.august.service.PostService;
+import com.wanted.august.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -16,10 +20,12 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 public class PostController {
-    @PostMapping
-    public void create(@Valid @RequestBody PostCreateRequest request, Authentication authentication) {
-        // 유저 정보 확인
+    private final UserService userService;
+    private final PostService postService;
 
-        // 포스트 저장
+    @PostMapping
+    public Response<Post> create(@Valid @RequestBody PostCreateRequest request, Authentication authentication) {
+        Post post = postService.create(request, authentication.getName());
+        return Response.success(post);
     }
 }

@@ -53,6 +53,12 @@ public class UserServiceImpl implements UserService {
         return jwtTokenUtil.generateAccessToken(savedUser.getUsername());
     }
 
+    public UserEntity findByUserNameOrElseThrow(String userName) {
+        return userRepository.findByUserName(userName).orElseThrow(() -> {
+            throw new AugustApplicationException(ErrorCode.USER_NOT_FOUND);
+        });
+    }
+
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return User.fromEntity(userRepository.findByUserName(username).orElseThrow(() -> new AugustApplicationException(ErrorCode.USER_NOT_FOUND)));
     }

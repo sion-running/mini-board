@@ -35,6 +35,7 @@ public class User implements UserDetails {
                 .id(userEntity.getId())
                 .username(userEntity.getUserName())
                 .nickName(userEntity.getNickName())
+                .password(userEntity.getPassword())
                 .email(userEntity.getEmail())
                 .phone(userEntity.getPhone())
                 .role(userEntity.getRole())
