@@ -8,6 +8,7 @@ import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
+import com.wanted.august.model.request.SearchRequest;
 import com.wanted.august.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,13 +59,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findAllByOrderCreatedAt(String direction) {
+    public List<Post> searchList(SearchRequest searchRequest) {
+        if (Objects.isNull(searchRequest.getKeyword()) || searchRequest.getKeyword().isEmpty()) {
+            return findAllByOrderCreatedAt(searchRequest.getDirection());
+        }
+
+        return findByTitleContaining(searchRequest.getKeyword());
+    }
+
+    private List<Post> findAllByOrderCreatedAt(String direction) {
         if (direction.equals("ASC")) {
             return postRepository.findAllByOrderByCreatedAtAsc().stream().map(Post::fromEntity).collect(Collectors.toList());
         }
 
         return postRepository.findAllByOrderByCreatedAtDesc().stream().map(Post::fromEntity).collect(Collectors.toList());
     }
+
+    private List<Post> findByTitleContaining(String keyword) {
+        List<PostEntity> list = postRepository.findByTitleContaining(keyword);
+        return list.stream().map(Post::fromEntity).collect(Collectors.toList());
+    }
+
 
     private long getDaysSincePostCreated(PostEntity entity) {
         LocalDateTime createdAt = entity.getCreatedAt();
