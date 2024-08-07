@@ -8,6 +8,7 @@ import com.wanted.august.model.request.UserJoinRequest;
 import com.wanted.august.model.request.UserLoginRequest;
 import com.wanted.august.repository.UserRepository;
 import com.wanted.august.utils.JwtTokenUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,17 +16,11 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenUtil jwtTokenUtil;
-
-    public UserServiceImpl(UserRepository userRepository, JwtTokenUtil jwtTokenUtil, BCryptPasswordEncoder encoder) {
-        this.userRepository = userRepository;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.encoder = encoder;
-    }
 
     // 회원가입
     @Override
