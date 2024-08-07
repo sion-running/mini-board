@@ -30,7 +30,6 @@ public class JoinControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-//    @WithAnonymousUser
     public void 회원가입_아이디_유효성검증_통과() throws Exception {
         String userName = "sion1234";
         String nickName = "sion";
@@ -55,7 +54,6 @@ public class JoinControllerTest {
     }
 
     @Test
-//    @WithAnonymousUser
     public void 회원가입시_작성자명은_영어나_한글로만_가능하다() throws Exception {
         String userName = "sion1234";
         String nickName = "안녕~~";
@@ -80,7 +78,6 @@ public class JoinControllerTest {
     }
 
     @Test
-//    @WithAnonymousUser
     public void 회원가입시_이메일_유효성검사() throws Exception {
         String userName = "sion1234";
         String writer = "sion";
@@ -105,7 +102,6 @@ public class JoinControllerTest {
     }
 
     @Test
-//    @WithAnonymousUser
     public void 회원가입시_휴대폰_유효성검사() throws Exception {
         String userName = "sion1234";
         String writer = "sion";
