@@ -23,8 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @EnableJpaAuditing
@@ -204,6 +203,30 @@ public class PostServiceTest {
     }
 
     @Test
+    void 포스트_삭제시_포스트가_존재하지_않으면_예외를_발생시킨다() {
+        // given
+        String userName = "sion1234";
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostEntity entity = PostEntity.builder()
+                .id(1L)
+                .title("title1")
+                .content("contet1")
+                .user(userEntity)
+                .build();
+
+        when(postRepository.findById(1L)).thenReturn(Optional.empty());
+
+        AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
+                postService.delete(1L, true, userName));
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
     void 포스트_수정시_작성자와_로그인_유저가_다르면_에러발생() {
         // given
         String postWriter = "sion1234";
@@ -243,6 +266,99 @@ public class PostServiceTest {
         AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
                 postService.update(request, loggedInUser));
         Assertions.assertEquals(ErrorCode.INVALID_POST_WRITER, exception.getErrorCode());
+    }
+
+    @Test
+    void 포스트_삭제시_현재_로그인_유저가_해당_포스트의_작성자가_아니면_예외를_발생시킨다() {
+        // given
+        String postWriter = "sion1234";
+        String loggedInUser = "anotherLoginUser";
+
+        UserEntity loggedInUserEntity = UserEntity.builder()
+                .id(1L)
+                .userName(loggedInUser)
+                .password("encodedPassword")
+                .build();
+
+        UserEntity postWriterEntity = UserEntity.builder()
+                .id(2L)
+                .userName(postWriter)
+                .password("encodedPassword")
+                .build();
+
+        PostEntity entity = PostEntity.builder()
+                .id(1L)
+                .title("title1")
+                .content("contet1")
+                .user(postWriterEntity)
+                .createdAt(LocalDateTime.now().minus(1, ChronoUnit.DAYS))
+                .build();
+
+        when(userService.findByUserNameOrElseThrow(loggedInUser)).thenReturn(loggedInUserEntity);
+        when(postRepository.findById(1L)).thenReturn(Optional.of(entity));
+
+        // then
+        AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
+                postService.delete(1L, true, loggedInUser));
+        Assertions.assertEquals(ErrorCode.INVALID_POST_WRITER, exception.getErrorCode());
+    }
+
+    @Test
+    void 포스트_논리삭제_성공() {
+        String userName= "user1234";
+        UserEntity postWriterEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostEntity entity = PostEntity.builder()
+                .id(1L)
+                .title("title1")
+                .content("contet1")
+                .user(postWriterEntity)
+                .createdAt(LocalDateTime.now().minus(1, ChronoUnit.DAYS))
+                .build();
+
+        when(userService.findByUserNameOrElseThrow(userName)).thenReturn(postWriterEntity);
+        when(postRepository.findById(1L)).thenReturn(Optional.of(entity));
+
+        postService.delete(entity.getId(), true, userName);
+
+        assertThat(entity.getDeletedAt()).isNotNull();
+    }
+
+    @Test
+    void 포스트_물리삭제_성공() {
+        // given
+        String userName = "user1234";
+        UserEntity postWriterEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostEntity entity = PostEntity.builder()
+                .id(1L)
+                .title("title1")
+                .content("contet1")
+                .user(postWriterEntity)
+                .createdAt(LocalDateTime.now().minus(1, ChronoUnit.DAYS))
+                .build();
+
+        when(userService.findByUserNameOrElseThrow(userName)).thenReturn(postWriterEntity);
+        when(postRepository.findById(1L)).thenReturn(Optional.of(entity));
+
+        // when
+        postService.delete(entity.getId(), false, userName); // false indicates hard delete
+
+        // then
+        verify(postRepository, times(1)).delete(entity);
+        verify(postRepository, times(1)).findById(1L);
+
+        when(postRepository.findById(1L)).thenReturn(Optional.empty());
+        Optional<PostEntity> deletedEntity = postRepository.findById(1L);
+        assertThat(deletedEntity).isEmpty();
     }
 }
 
