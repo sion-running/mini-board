@@ -18,10 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -103,12 +100,25 @@ public class PostServiceTest {
 
         PostUpdateRequest request = PostUpdateRequest.builder()
                 .postId(1L)
-                .title("포스트 제목1")
-                .content("포스트 내용")
+                .title("modified title")
+                .content("modified content")
+                .build();
+
+        PostEntity entity = PostEntity.builder()
+                .id(1L)
+                .title("original post title")
+                .content("original post content")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now().minus(1, ChronoUnit.DAYS))
                 .build();
 
         when(userService.findByUserNameOrElseThrow(userName)).thenReturn(userEntity);
+        when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(entity));
 
+        postService.update(request, userName);
+
+        assertThat(entity.getTitle()).isEqualTo("modified title");
+        assertThat(entity.getContent()).isEqualTo("modified content");
     }
 
     @Test
@@ -199,8 +209,14 @@ public class PostServiceTest {
         String postWriter = "sion1234";
         String loggedInUser = "anotherLoginUser";
 
-        UserEntity postWriterEntity = UserEntity.builder()
+        UserEntity loggedInUserEntity = UserEntity.builder()
                 .id(1L)
+                .userName(loggedInUser)
+                .password("encodedPassword")
+                .build();
+
+        UserEntity postWriterEntity = UserEntity.builder()
+                .id(2L)
                 .userName(postWriter)
                 .password("encodedPassword")
                 .build();
@@ -216,9 +232,11 @@ public class PostServiceTest {
                 .title("title1")
                 .content("contet1")
                 .user(postWriterEntity)
+                .createdAt(LocalDateTime.now().minus(1, ChronoUnit.DAYS))
                 .build();
 
         // Mocking the postRepository to return the post entity when the post ID is 1L
+        when(userService.findByUserNameOrElseThrow(loggedInUser)).thenReturn(loggedInUserEntity);
         when(postRepository.findById(1L)).thenReturn(Optional.of(entity));
 
         // then
