@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.mock;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class JoinControllerTest {
 
     @Autowired
@@ -29,17 +31,16 @@ public class JoinControllerTest {
 
     @Test
 //    @WithAnonymousUser
-    public void 회원가입시_작성자_유효성검증_통과() throws Exception {
+    public void 회원가입_아이디_유효성검증_통과() throws Exception {
         String userName = "sion1234";
-        String writer = "sion";
+        String nickName = "sion";
         String password = "paSS123!@#";
         String email = "sion@naver.com";
         String phone = "010-1111-2222";
 
-//        when(userService.join(userName, password)).thenReturn(mock(User.class));
         UserJoinRequest request = new UserJoinRequest(
                 userName,
-                writer,
+                nickName,
                 password,
                 email,
                 phone,
@@ -51,6 +52,31 @@ public class JoinControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+//    @WithAnonymousUser
+    public void 회원가입시_작성자명은_영어나_한글로만_가능하다() throws Exception {
+        String userName = "sion1234";
+        String nickName = "안녕~~";
+        String password = "paSS123!@#";
+        String email = "sionnaver.com";
+        String phone = "010-1111-2222";
+
+        UserJoinRequest request = new UserJoinRequest(
+                userName,
+                nickName,
+                password,
+                email,
+                phone,
+                UserRole.USER
+        );
+
+        mockMvc.perform(post("/user/join")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -86,31 +112,6 @@ public class JoinControllerTest {
         String password = "paSS123!@#";
         String email = "sion@naver.com";
         String phone = "010-11112222";
-
-        UserJoinRequest request = new UserJoinRequest(
-                userName,
-                writer,
-                password,
-                email,
-                phone,
-                UserRole.USER
-        );
-
-        mockMvc.perform(post("/user/join")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(request)))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-//    @WithAnonymousUser
-    public void 회원가입시_작성자() throws Exception {
-        String userName = "sion1234";
-        String writer = "sion";
-        String password = "paSS123!@#";
-        String email = "sionnaver.com";
-        String phone = "010-1111-2222";
 
         UserJoinRequest request = new UserJoinRequest(
                 userName,
