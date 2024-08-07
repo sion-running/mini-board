@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.anyString;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -157,7 +158,6 @@ public class UserServiceTest {
         Assertions.assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
     }
 
-    // TODO static 메소드 모킹
     @Test
     void 로그인에_성공하면_토큰을_반환한다() {
         // given
@@ -180,6 +180,7 @@ public class UserServiceTest {
         // Mocking
         when(userRepository.findByUserName(userName)).thenReturn(Optional.of(entity));
         when(encoder.matches(loginPassword, encryptedPassword)).thenReturn(true); // 패스워드 일치
+        when(jwtTokenUtil.generateAccessToken(anyString())).thenReturn(expectedToken);
 
         // when
         String token = userService.login(request);
