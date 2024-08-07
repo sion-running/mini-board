@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
-    private static final Integer UPDATE_AVAILABLE_PERIOD = 10;
+    private static final Integer LAST_ALLOWED_DAY_FOR_MODIFICATION = 9;
 
     @Override
     public Post create(PostCreateRequest request, String userName) {
@@ -36,17 +36,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void update(PostUpdateRequest request, String userName) {
+    public String update(PostUpdateRequest request, String userName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(userName);
         PostEntity postEntity = postRepository.findById(request.getPostId()).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
-        long days = getDaysSincePostCreated(postEntity);
+        long dayDiff = getDaysSincePostCreated(postEntity);
 
-        if (days > UPDATE_AVAILABLE_PERIOD) {
+        if (dayDiff > LAST_ALLOWED_DAY_FOR_MODIFICATION) {
             throw new AugustApplicationException(ErrorCode.POST_UPDATE_PERIOD_EXPIRED);
         }
 
-        if (days == UPDATE_AVAILABLE_PERIOD - 1) {
-            // TODO 훌 후 수정 불가 알람
+        if (dayDiff == LAST_ALLOWED_DAY_FOR_MODIFICATION) {
+            return "LAST_DAY_FOR_MODIFICATION";
         }
 
         if (!postEntity.getUser().getUserName().equals(userName)) {
@@ -56,6 +56,8 @@ public class PostServiceImpl implements PostService {
         postEntity.setTitle(request.getTitle());
         postEntity.setContent(request.getContent());
         postRepository.save(postEntity);
+
+        return "MODIFIED";
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.List;
 public interface PostService {
     Post create(PostCreateRequest request, String userName);
 
-    void update(PostUpdateRequest request, String userName);
+    String update(PostUpdateRequest request, String userName);
 
     List<Post> searchList(SearchRequest request);
 }

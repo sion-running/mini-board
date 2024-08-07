@@ -8,6 +8,7 @@ import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.repository.PostRepository;
+import com.wanted.august.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +16,12 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -26,12 +30,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@EnableJpaAuditing
 public class PostServiceTest {
     @InjectMocks
     PostServiceImpl postService;
 
     @Mock
     UserServiceImpl userService;
+
+    @Mock
+    UserRepository userRepository;
 
     @Mock
     PostRepository postRepository;
@@ -58,6 +66,29 @@ public class PostServiceTest {
         Post actual = postService.create(request, userName);
         assertThat(actual.getTitle()).isEqualTo(request.getTitle());
         assertThat(actual.getContent()).isEqualTo(request.getContent());
+    }
+
+    @Test
+    void 포스트_생성시간이_자동으로_저장된다() { // TODO FIX
+        // given
+        String userName = "sion1234";
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostCreateRequest request = PostCreateRequest.builder()
+                .title("포스트 제목1")
+                .content("포스트 내용")
+                .build();
+
+        PostEntity postEntity = PostEntity.toEntity(request, userEntity);
+        when(userService.findByUserNameOrElseThrow(userName)).thenReturn(userEntity);
+        when(postRepository.save(ArgumentMatchers.any(PostEntity.class))).thenReturn(postEntity);
+
+        Post actual = postService.create(request, userName);
+        assertThat(actual.getCreatedAt()).isNotNull();
     }
 
     @Test
@@ -106,7 +137,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트_생성후_10일이_지나면_수정불가_예외를_발생시킨다() {
+    void 포스트_생성후_10일이상_지나면_수정불가_예외를_발생시킨다() {
         // given
         String userName = "sion1234";
         UserEntity userEntity = UserEntity.builder()
@@ -122,8 +153,8 @@ public class PostServiceTest {
                 .build();
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime twentyDaysAgo = now.minus(11, ChronoUnit.DAYS); // 현재기준 20일 전을 생성일로 설정
-        PostEntity entity = PostEntity.builder().id(1L).createdAt(twentyDaysAgo).build();
+        LocalDateTime tenDaysAgo = now.minus(10, ChronoUnit.DAYS); // 현재기준 10일 전을 생성일로 설정
+        PostEntity entity = PostEntity.builder().id(1L).createdAt(tenDaysAgo).build();
 
         when(userService.findByUserNameOrElseThrow(userName)).thenReturn(userEntity);
         when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(entity));
@@ -132,6 +163,34 @@ public class PostServiceTest {
         AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
                 postService.update(request, userName));
         Assertions.assertEquals(ErrorCode.POST_UPDATE_PERIOD_EXPIRED, exception.getErrorCode());
+    }
+
+    @Test
+    void 포스트_수정시_생성_후_9일째되는_날이면_알람_메시지를_반환한다() {
+        // given
+        String userName = "sion1234";
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName(userName)
+                .password("encodedPassword")
+                .build();
+
+        PostUpdateRequest request = PostUpdateRequest.builder()
+                .postId(1L)
+                .title("포스트 제목1")
+                .content("포스트 내용")
+                .build();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tenDaysAgo = now.minus(9, ChronoUnit.DAYS); // 현재기준 9일 전을 생성일로 설정
+        PostEntity entity = PostEntity.builder().id(1L).createdAt(tenDaysAgo).build();
+
+        when(userService.findByUserNameOrElseThrow(userName)).thenReturn(userEntity);
+        when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(entity));
+
+        // then
+        String updatedMessage = postService.update(request, userName);
+        assertThat(updatedMessage).isEqualTo("LAST_DAY_FOR_MODIFICATION");
     }
 
     @Test

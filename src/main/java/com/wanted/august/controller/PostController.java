@@ -34,9 +34,9 @@ public class PostController {
     }
 
     @PutMapping
-    public Response<Post> update(@Valid @RequestBody PostUpdateRequest request, Authentication authentication) {
-        postService.update(request, authentication.getName());
-        return Response.success();
+    public Response<String> update(@Valid @RequestBody PostUpdateRequest request, Authentication authentication) {
+        String message = postService.update(request, authentication.getName());
+        return Response.success(message);
     }
 
 //    @GetMapping
