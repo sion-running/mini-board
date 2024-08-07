@@ -3,13 +3,13 @@ package com.wanted.august.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wanted.august.model.User;
 import com.wanted.august.model.request.PostCreateRequest;
+import com.wanted.august.service.PostServiceImpl;
 import com.wanted.august.service.UserServiceImpl;
 import com.wanted.august.utils.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
@@ -29,6 +29,9 @@ public class PostControllerTest {
 
     @MockBean
     private UserServiceImpl userService;
+
+    @MockBean
+    private PostServiceImpl postService;
 
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
