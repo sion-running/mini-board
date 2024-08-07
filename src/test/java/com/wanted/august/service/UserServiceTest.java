@@ -60,7 +60,7 @@ public class UserServiceTest {
                 UserRole.USER
         );
 
-        UserEntity entity = UserEntity.toEntity(request);
+        UserEntity entity = UserEntity.toEntity(request, "encryptedPassword");
         when(userRepository.save(ArgumentMatchers.any(UserEntity.class))).thenReturn(entity);
 
         User actual = userService.join(request);
@@ -111,14 +111,13 @@ public class UserServiceTest {
                 UserRole.USER
         );
 
-        // when
-        UserEntity savedEntity = UserEntity.toEntity(request);
-        savedEntity.setId(1L);
-
         when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
-        when(encoder.encode(password)).thenReturn("encryptedPassword");
+        when(encoder.encode(request.getPassword())).thenReturn("encryptedPassword");
+        UserEntity savedEntity = UserEntity.toEntity(request, "encryptedPassword");
+        savedEntity.setId(1L);
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedEntity); // 실제로 save 될 엔티티 생성 및 id도 명시적으로 설정
 
+        // when
         Assertions.assertDoesNotThrow(() -> userService.join(request));
 
         // then
