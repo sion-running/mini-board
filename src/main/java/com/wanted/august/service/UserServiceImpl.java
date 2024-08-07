@@ -8,9 +8,7 @@ import com.wanted.august.model.request.UserJoinRequest;
 import com.wanted.august.model.request.UserLoginRequest;
 import com.wanted.august.repository.UserRepository;
 import com.wanted.august.utils.JwtTokenUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,10 +21,10 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public UserServiceImpl(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
+    public UserServiceImpl(UserRepository userRepository, JwtTokenUtil jwtTokenUtil, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.encoder = new BCryptPasswordEncoder();
+        this.encoder = encoder;
     }
 
     // 회원가입
@@ -36,8 +34,9 @@ public class UserServiceImpl implements UserService {
             throw new AugustApplicationException(ErrorCode.DUPLICATE_USER_NAME);
         });
 
-        request.setPassword(encoder.encode(request.getPassword()));
-        UserEntity saved = userRepository.save(UserEntity.toEntity(request));
+        String encoded = encoder.encode(request.getPassword());
+        UserEntity saved = userRepository.save(UserEntity.toEntity(request, encoded));
+
         return User.fromEntity(saved);
     }
 

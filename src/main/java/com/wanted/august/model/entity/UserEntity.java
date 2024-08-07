@@ -35,11 +35,11 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
-    public static UserEntity toEntity(UserJoinRequest request) {
+    public static UserEntity toEntity(UserJoinRequest request, String encodedPassword) {
         return UserEntity.builder()
                 .userName(request.getUserName())
                 .nickName(request.getNickName())
-                .password(request.getPassword())
+                .password(encodedPassword)
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .role(request.getRole())
