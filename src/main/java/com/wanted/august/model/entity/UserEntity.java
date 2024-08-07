@@ -22,7 +22,7 @@ public class UserEntity extends BaseEntity {
     private Long id;
 
     @Column(name = "user_name", unique = true)
-    private String userName;
+    private String userName; // 회원가입 아이디
 
     private String nickName; // 작성자명 대체
 
