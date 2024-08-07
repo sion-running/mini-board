@@ -4,6 +4,7 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
+import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -67,6 +69,24 @@ public class PostServiceImpl implements PostService {
         }
 
         return findByTitleContaining(searchRequest.getKeyword());
+    }
+
+    @Override
+    public void delete(Long postId, Boolean isSoftDelete, String loginUserName) {
+        UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
+        PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
+
+        if (!postEntity.getUser().getUserName().equals(loginUserName)) {
+            throw new AugustApplicationException(ErrorCode.INVALID_POST_WRITER); // 작성자가 아니라면 삭제불가
+        }
+
+        if (isSoftDelete) {
+            postEntity.setDeletedAt(LocalDateTime.now());
+            postRepository.save(postEntity);
+            return;
+        }
+
+        postRepository.delete(postEntity);
     }
 
     private List<Post> findAllByOrderCreatedAt(String direction) {

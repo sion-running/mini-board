@@ -50,4 +50,12 @@ public class PostController {
         List<Post> postList = postService.searchList(request);
         return Response.success(postList);
     }
+
+    @DeleteMapping("/{postId}")
+    public Response<Void> delete(@PathVariable("postId") Long postId,
+                                 @RequestParam(value = "isSoftDelete", defaultValue = "true") Boolean isSoftDelete,
+                                 Authentication authentication) {
+        postService.delete(postId, isSoftDelete, authentication.getName());
+        return Response.success();
+    }
 }

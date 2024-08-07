@@ -14,4 +14,6 @@ public interface PostService {
     String update(PostUpdateRequest request, String userName);
 
     List<Post> searchList(SearchRequest request);
+
+    void delete(Long postId, Boolean isSoftDelete, String userName);
 }
