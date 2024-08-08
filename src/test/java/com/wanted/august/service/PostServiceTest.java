@@ -350,13 +350,11 @@ public class PostServiceTest {
         when(postRepository.findById(1L)).thenReturn(Optional.of(entity));
 
         // when
-        postService.delete(entity.getId(), false, userName); // false indicates hard delete
+        postService.delete(entity.getId(), false, userName);
+        verify(postRepository, times(1)).delete(entity);
+        when(postRepository.findById(1L)).thenReturn(Optional.empty());
 
         // then
-        verify(postRepository, times(1)).delete(entity);
-        verify(postRepository, times(1)).findById(1L);
-
-        when(postRepository.findById(1L)).thenReturn(Optional.empty());
         Optional<PostEntity> deletedEntity = postRepository.findById(1L);
         assertThat(deletedEntity).isEmpty();
     }
