@@ -7,6 +7,7 @@ import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
+import com.wanted.august.model.request.SearchRequest;
 import com.wanted.august.repository.PostRepository;
 import com.wanted.august.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,6 +88,91 @@ public class PostServiceTest {
 
         Post actual = postService.create(request, userName);
         assertThat(actual.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void 포스트_조회시_title로_검색이_가능하다() {
+        // given
+        SearchRequest searchRequest = SearchRequest.builder().keyword("오후").build();
+
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName("user1234")
+                .password("encodedPassword")
+                .build();
+
+        PostEntity post1 = PostEntity.builder()
+                .id(1L)
+                .title("오전의 포스트")
+                .content("content")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now().minusDays(2))
+                .build();
+
+        PostEntity post2 = PostEntity.builder()
+                .id(2L)
+                .title("오후의 포스트1")
+                .content("content1")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        PostEntity post3 = PostEntity.builder()
+                .id(3L)
+                .title("오후의 포스트2")
+                .content("content2")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        List<PostEntity> posts = Arrays.asList(post2, post3);
+
+        // when
+        when(postRepository.findByTitleContaining(searchRequest.getKeyword())).thenReturn(posts);
+        List<Post> postList = postService.searchList(searchRequest);
+
+        // then
+        assertThat(postList).hasSize(2);
+        assertThat(postList).extracting("title").doesNotContain("오전의 포스트");
+    }
+
+    @Test
+    void 포스트_조회시_검색어가_없다면_생성일_기준_내림차순_정렬해서_보여준다() {
+        // given
+        SearchRequest searchRequest = SearchRequest.builder().build();
+
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName("user1234")
+                .password("encodedPassword")
+                .build();
+
+        PostEntity post1 = PostEntity.builder()
+                .id(1L)
+                .title("title1")
+                .content("content1")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        PostEntity post2 = PostEntity.builder()
+                .id(2L)
+                .title("title2")
+                .content("content2")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        List<PostEntity> posts = Arrays.asList(post2, post1); // Post2가 최신, Post1이 이전 게시글
+        when(postRepository.findAllByOrderByCreatedAtDesc()).thenReturn(posts);
+
+        // when
+        List<Post> postList = postService.searchList(searchRequest);
+
+        // then
+        assertThat(postList).hasSize(2);
+        assertThat(postList.get(0).getId()).isEqualTo(post2.getId()); // 가장 최신 게시글
+        assertThat(postList.get(1).getId()).isEqualTo(post1.getId()); // 그 다음 게시글
     }
 
     @Test
