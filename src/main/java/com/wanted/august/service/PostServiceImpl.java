@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,8 +37,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public String update(PostUpdateRequest request, String userName) {
-        UserEntity userEntity = userService.findByUserNameOrElseThrow(userName);
+    public String update(PostUpdateRequest request, String loginUserName) {
+        UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = postRepository.findById(request.getPostId()).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
         long dayDiff = getDaysSincePostCreated(postEntity);
 
@@ -51,8 +50,8 @@ public class PostServiceImpl implements PostService {
             return "LAST_DAY_FOR_MODIFICATION";
         }
 
-        if (!postEntity.getUser().getUserName().equals(userName)) {
-            throw new AugustApplicationException(ErrorCode.INVALID_POST_WRITER); // 작성자가 아니라면 수정불가
+        if (!hasPermissionForModification(postEntity, userEntity)) {
+            throw new AugustApplicationException(ErrorCode.NO_PERMISSION_FOR_THE_POST);
         }
 
         postEntity.setTitle(request.getTitle());
@@ -76,8 +75,8 @@ public class PostServiceImpl implements PostService {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
 
-        if (!postEntity.getUser().getUserName().equals(loginUserName)) {
-            throw new AugustApplicationException(ErrorCode.INVALID_POST_WRITER); // 작성자가 아니라면 삭제불가
+        if (!hasPermissionForModification(postEntity, userEntity)) {
+            throw new AugustApplicationException(ErrorCode.NO_PERMISSION_FOR_THE_POST);
         }
 
         if (isSoftDelete) {
@@ -88,6 +87,22 @@ public class PostServiceImpl implements PostService {
 
         postRepository.delete(postEntity);
     }
+
+    /**
+     * 포스트에 대한 변경(수정, 삭제) 권한을 체크하는 메소드
+     * 현재는 관리자가 수정과 삭제 모두 가능하나 추후 변경되면 분리
+     */
+    private Boolean hasPermissionForModification(PostEntity postEntity, UserEntity loginUser) {
+        if (loginUser.getRole().equals(UserRole.ADMIN)) {
+            return true; // 관리자는 모든 게시물 수정 및 삭제 가능
+        }
+
+        if (postEntity.getUser().getUserName().equals(loginUser.getUserName())) {
+            return true; // 작성자 본인만 수정 및 삭제 가능
+        }
+
+        return false;
+    };
 
     private List<Post> findAllByOrderCreatedAt(String direction) {
         if (direction.equals("ASC")) {

@@ -265,7 +265,7 @@ public class PostServiceTest {
         // then
         AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
                 postService.update(request, loggedInUser));
-        Assertions.assertEquals(ErrorCode.INVALID_POST_WRITER, exception.getErrorCode());
+        Assertions.assertEquals(ErrorCode.NO_PERMISSION_FOR_THE_POST, exception.getErrorCode());
     }
 
     @Test
@@ -300,7 +300,7 @@ public class PostServiceTest {
         // then
         AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
                 postService.delete(1L, true, loggedInUser));
-        Assertions.assertEquals(ErrorCode.INVALID_POST_WRITER, exception.getErrorCode());
+        Assertions.assertEquals(ErrorCode.NO_PERMISSION_FOR_THE_POST, exception.getErrorCode());
     }
 
     @Test

@@ -14,7 +14,7 @@ public enum ErrorCode {
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "System error occurred"),
     DUPLICATE_USER_NAME(HttpStatus.CONFLICT, "Duplicate user name"),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
-    INVALID_POST_WRITER(HttpStatus.NOT_FOUND, "Invalid post writer"),
+    NO_PERMISSION_FOR_THE_POST(HttpStatus.FORBIDDEN, "User does not have permission for this post"),
     POST_UPDATE_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "Update period expired"),
     ;
 
