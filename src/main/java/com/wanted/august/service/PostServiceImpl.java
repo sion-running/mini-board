@@ -37,6 +37,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> searchList(SearchRequest searchRequest) {
+        if (Objects.isNull(searchRequest.getKeyword()) || searchRequest.getKeyword().isEmpty()) {
+            return findAllByOrderCreatedAt(searchRequest.getDirection());
+        }
+
+        return findByTitleContaining(searchRequest.getKeyword());
+    }
+
+    @Override
     public String update(PostUpdateRequest request, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = postRepository.findById(request.getPostId()).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
@@ -62,15 +71,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> searchList(SearchRequest searchRequest) {
-        if (Objects.isNull(searchRequest.getKeyword()) || searchRequest.getKeyword().isEmpty()) {
-            return findAllByOrderCreatedAt(searchRequest.getDirection());
-        }
-
-        return findByTitleContaining(searchRequest.getKeyword());
-    }
-
-    @Override
     public void delete(Long postId, Boolean isSoftDelete, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
@@ -88,6 +88,19 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(postEntity);
     }
 
+    private List<Post> findAllByOrderCreatedAt(String direction) {
+        if (direction.equals("ASC")) {
+            return postRepository.findAllByOrderByCreatedAtAsc().stream().map(Post::fromEntity).collect(Collectors.toList());
+        }
+
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(Post::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<Post> findByTitleContaining(String keyword) {
+        List<PostEntity> list = postRepository.findByTitleContaining(keyword);
+        return list.stream().map(Post::fromEntity).collect(Collectors.toList());
+    }
+
     /**
      * 포스트에 대한 변경(수정, 삭제) 권한을 체크하는 메소드
      * 현재는 관리자가 수정과 삭제 모두 가능하나 추후 변경되면 분리
@@ -103,20 +116,6 @@ public class PostServiceImpl implements PostService {
 
         return false;
     };
-
-    private List<Post> findAllByOrderCreatedAt(String direction) {
-        if (direction.equals("ASC")) {
-            return postRepository.findAllByOrderByCreatedAtAsc().stream().map(Post::fromEntity).collect(Collectors.toList());
-        }
-
-        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(Post::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<Post> findByTitleContaining(String keyword) {
-        List<PostEntity> list = postRepository.findByTitleContaining(keyword);
-        return list.stream().map(Post::fromEntity).collect(Collectors.toList());
-    }
-
 
     private long getDaysSincePostCreated(PostEntity entity) {
         LocalDateTime createdAt = entity.getCreatedAt();

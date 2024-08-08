@@ -33,22 +33,16 @@ public class PostController {
         return Response.success(post);
     }
 
-    @PutMapping
-    public Response<String> update(@Valid @RequestBody PostUpdateRequest request, Authentication authentication) {
-        String message = postService.update(request, authentication.getName());
-        return Response.success(message);
-    }
-
-//    @GetMapping
-//    public Response<List<Post>> getListByCreatedAt(@RequestParam(value = "order", defaultValue = "ASC") String order) {
-//        List<Post> list = postService.findAllByOrderCreatedAt(order);
-//        return Response.success(list);
-//    }
-
     @GetMapping
     public Response<List<Post>> list(@RequestBody SearchRequest request) {
         List<Post> postList = postService.searchList(request);
         return Response.success(postList);
+    }
+
+    @PutMapping
+    public Response<String> update(@Valid @RequestBody PostUpdateRequest request, Authentication authentication) {
+        String message = postService.update(request, authentication.getName());
+        return Response.success(message);
     }
 
     @DeleteMapping("/{postId}")
