@@ -10,6 +10,7 @@ import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
+import com.wanted.august.model.response.PostDetailResponse;
 import com.wanted.august.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,18 @@ public class PostServiceImpl implements PostService {
 
         PostEntity saved = postRepository.save(postEntity);
         return Post.fromEntity(saved);
+    }
+
+    @Override
+    public PostDetailResponse getPostDetail(Long postId) {
+        PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
+
+        // 수정 가능일 계산
+        long leftDays = LAST_ALLOWED_DAY_FOR_MODIFICATION - getDaysSincePostCreated(postEntity);
+        PostDetailResponse response = PostDetailResponse.fromEntity(postEntity);
+        response.setLeftDaysForModification(leftDays);
+
+        return response;
     }
 
     @Override

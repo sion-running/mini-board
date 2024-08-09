@@ -8,6 +8,7 @@ import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
+import com.wanted.august.model.response.PostDetailResponse;
 import com.wanted.august.repository.PostRepository;
 import com.wanted.august.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -88,6 +89,30 @@ public class PostServiceTest {
 
         Post actual = postService.create(request, userName);
         assertThat(actual.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void 포스트_상세_조회시_남은_수정_가능일을_보여준다() {
+        Long postId = 1L;
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName("user1234")
+                .password("encodedPassword")
+                .build();
+
+        PostEntity postEntity = PostEntity.builder()
+                .id(1L)
+                .title("테스트 포스트")
+                .content("content")
+                .user(userEntity)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        PostDetailResponse actual = postService.getPostDetail(postId);
+        assertThat(actual.getLeftDaysForModification()).isEqualTo(8);
+
     }
 
     @Test

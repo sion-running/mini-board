@@ -4,6 +4,7 @@ import com.wanted.august.model.Post;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
+import com.wanted.august.model.response.PostDetailResponse;
 import com.wanted.august.model.response.Response;
 import com.wanted.august.service.PostService;
 import com.wanted.august.service.UserService;
@@ -31,6 +32,12 @@ public class PostController {
     public Response<Post> create(@Valid @RequestBody PostCreateRequest request, Authentication authentication) {
         Post post = postService.create(request, authentication.getName());
         return Response.success(post);
+    }
+
+    @GetMapping("/{postId}")
+    public Response<PostDetailResponse> getPostDetail(@PathVariable("postId") Long postId) {
+        PostDetailResponse postDetail = postService.getPostDetail(postId);
+        return Response.success(postDetail);
     }
 
     @GetMapping
