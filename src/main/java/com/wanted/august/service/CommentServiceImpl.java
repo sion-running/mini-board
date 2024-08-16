@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity commentEntity = commentRepository.findById(request.getCommentId()).orElseThrow(() -> new AugustApplicationException(ErrorCode.COMMENT_NOT_FOUND));
 
         // 본인이 작성한 댓글이 맞는 지 확인
-        if (writerName != commentEntity.getUserName()) {
+        if (!writerName.equals(commentEntity.getUserName())) {
             throw new AugustApplicationException(ErrorCode.NO_PERMISSION_FOR_THE_COMMENT);
         }
 
