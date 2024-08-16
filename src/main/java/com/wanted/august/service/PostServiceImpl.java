@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDetailResponse getPostDetail(Long postId) {
-        PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
+        PostEntity postEntity = findByPostIdOrElseThrow(postId);
 
         // 수정 가능일 계산
         long leftDays = LAST_ALLOWED_DAY_FOR_MODIFICATION - getDaysSincePostCreated(postEntity);
@@ -61,7 +61,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public String update(PostUpdateRequest request, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
-        PostEntity postEntity = postRepository.findById(request.getPostId()).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
+        PostEntity postEntity = findByPostIdOrElseThrow(request.getPostId());
         long dayDiff = getDaysSincePostCreated(postEntity);
 
         if (dayDiff > LAST_ALLOWED_DAY_FOR_MODIFICATION) {
@@ -86,7 +86,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void delete(Long postId, Boolean isSoftDelete, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
-        PostEntity postEntity = postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
+        PostEntity postEntity = findByPostIdOrElseThrow(postId);
 
         if (!hasPermissionForModification(postEntity, userEntity)) {
             throw new AugustApplicationException(ErrorCode.NO_PERMISSION_FOR_THE_POST);
@@ -99,6 +99,10 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.delete(postEntity);
+    }
+
+    public PostEntity findByPostIdOrElseThrow(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
     }
 
     private List<Post> findAllByOrderCreatedAt(String direction) {
