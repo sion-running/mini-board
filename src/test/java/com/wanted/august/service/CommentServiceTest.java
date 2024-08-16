@@ -65,7 +65,7 @@ public class CommentServiceTest {
 
         when(userService.findByUserNameOrElseThrow(writerName)).thenReturn(userEntity);
         when(postService.findByPostIdOrElseThrow(postEntity.getId())).thenReturn(postEntity);
-        when(commentRepository.findByPostIdAndUserName(1L, writerName)).thenReturn(Optional.of(new CommentEntity()));
+        when(commentRepository.findByPostIdAndUserName(1L, writerName)).thenReturn(Optional.of(CommentEntity.builder().build()));
 
         // then
         AugustApplicationException exception = Assertions.assertThrows(AugustApplicationException.class, () ->
