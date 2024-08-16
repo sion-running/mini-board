@@ -1,6 +1,7 @@
 package com.wanted.august.service;
 
 import com.wanted.august.model.Post;
+import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
@@ -19,4 +20,6 @@ public interface PostService {
     List<Post> searchList(SearchRequest request);
 
     void delete(Long postId, Boolean isSoftDelete, String userName);
+
+    PostEntity findByPostIdOrElseThrow(Long postId);
 }
