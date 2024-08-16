@@ -16,6 +16,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     NO_PERMISSION_FOR_THE_POST(HttpStatus.FORBIDDEN, "User does not have permission for this post"),
     POST_UPDATE_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "Update period expired"),
+    COMMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "User already has a comment on this post")
     ;
 
     private final HttpStatus status;
