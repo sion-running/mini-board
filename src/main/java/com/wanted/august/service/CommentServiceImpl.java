@@ -12,6 +12,7 @@ import com.wanted.august.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -60,5 +61,16 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity saved = commentRepository.save(commentEntity);
 
         return Comment.fromEntity(saved);
+    }
+
+    public void delete(Long commentId, String writerName) {
+        CommentEntity commentEntity = commentRepository.findById(commentId).orElseThrow(() -> new AugustApplicationException(ErrorCode.COMMENT_NOT_FOUND));
+
+        if (!writerName.equals(commentEntity.getUserName())) {
+            throw new AugustApplicationException(ErrorCode.NO_PERMISSION_FOR_THE_COMMENT);
+        }
+
+        commentEntity.setDeletedAt(LocalDateTime.now());
+        commentRepository.save(commentEntity);
     }
 }

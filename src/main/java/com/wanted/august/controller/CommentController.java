@@ -28,4 +28,10 @@ public class CommentController {
         Comment updated = commentService.update(request, authentication.getName());
         return Response.success(updated);
     }
+
+    @DeleteMapping
+    public Response<Void> delete(@RequestParam("id") Long commentId, Authentication authentication) {
+        commentService.delete(commentId, authentication.getName());
+        return Response.success();
+    }
 }

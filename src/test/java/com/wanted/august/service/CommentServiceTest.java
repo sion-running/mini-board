@@ -174,4 +174,17 @@ public class CommentServiceTest {
         assertThat(updated.getContent()).isEqualTo(request.getContent());
         assertThat(updated.getId()).isEqualTo(request.getCommentId());
     }
+
+    @Test
+    void 댓글_소프트_삭제_성공() {
+        // given
+        String writerName = "sion1234";
+        CommentEntity commentEntity = CommentEntity.builder().id(1L).postId(1L).userName(writerName).content("댓글").build();
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(commentEntity));
+
+        commentService.delete(1L, writerName);
+
+        assertThat(commentEntity.getId()).isEqualTo(1L);
+        assertThat(commentEntity.getDeletedAt()).isNotNull();
+    }
 }
