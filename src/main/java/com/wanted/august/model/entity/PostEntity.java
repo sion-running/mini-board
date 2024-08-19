@@ -1,5 +1,6 @@
 package com.wanted.august.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wanted.august.model.User;
 import com.wanted.august.model.request.PostCreateRequest;
 import lombok.*;
@@ -12,7 +13,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-
 @Data
 @Builder
 @Table(name = "post")
@@ -27,7 +27,7 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 

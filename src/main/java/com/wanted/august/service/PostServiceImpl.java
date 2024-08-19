@@ -4,6 +4,7 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
+import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
@@ -13,13 +14,14 @@ import com.wanted.august.model.request.SearchRequest;
 import com.wanted.august.model.response.PostDetailResponse;
 import com.wanted.august.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,12 +52,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> searchList(SearchRequest searchRequest) {
-        if (Objects.isNull(searchRequest.getKeyword()) || searchRequest.getKeyword().isEmpty()) {
-            return findAllByOrderCreatedAt(searchRequest.getDirection());
+    public Page<PostDetail> search(SearchRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageStart(), request.getPageSize(), getSortDetail(request)); // TODO sort type 문자열 리팩토링
+        String title = request.getTitle();
+
+        if (title == null || title.isBlank()) {
+            return postRepository.findPostDetailsWithViewCount(pageable);
         }
 
-        return findByTitleContaining(searchRequest.getKeyword());
+        return postRepository.findPostDetailsWithViewCountByTitle(pageable, title);
     }
 
     @Override
@@ -105,19 +110,6 @@ public class PostServiceImpl implements PostService {
         return postRepository.findById(postId).orElseThrow(() -> new AugustApplicationException(ErrorCode.POST_NOT_FOUND));
     }
 
-    private List<Post> findAllByOrderCreatedAt(String direction) {
-        if (direction.equals("ASC")) {
-            return postRepository.findAllByOrderByCreatedAtAsc().stream().map(Post::fromEntity).collect(Collectors.toList());
-        }
-
-        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(Post::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<Post> findByTitleContaining(String keyword) {
-        List<PostEntity> list = postRepository.findByTitleContaining(keyword);
-        return list.stream().map(Post::fromEntity).collect(Collectors.toList());
-    }
-
     /**
      * 포스트에 대한 변경(수정, 삭제) 권한을 체크하는 메소드
      * 현재는 관리자가 수정과 삭제 모두 가능하나 추후 변경되면 분리
@@ -138,5 +130,14 @@ public class PostServiceImpl implements PostService {
         LocalDateTime createdAt = entity.getCreatedAt();
         LocalDateTime now = LocalDateTime.now();
         return ChronoUnit.DAYS.between(createdAt, now);
+    }
+
+    private Sort getSortDetail(SearchRequest request) {
+        String sortDirection = request.getDirection();
+        if (sortDirection.equals("ASC")) {
+            return Sort.by("createdAt").ascending();
+        }
+
+        return Sort.by("createdAt").descending();
     }
 }

@@ -3,6 +3,7 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
+import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
@@ -118,7 +120,7 @@ public class PostServiceTest {
     @Test
     void 포스트_조회시_title로_검색이_가능하다() {
         // given
-        SearchRequest searchRequest = SearchRequest.builder().keyword("오후").build();
+        SearchRequest searchRequest = SearchRequest.builder().title("오후").build();
 
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
@@ -153,12 +155,14 @@ public class PostServiceTest {
         List<PostEntity> posts = Arrays.asList(post2, post3);
 
         // when
-        when(postRepository.findByTitleContaining(searchRequest.getKeyword())).thenReturn(posts);
-        List<Post> postList = postService.searchList(searchRequest);
+        when(postRepository.findByTitleContaining(searchRequest.getTitle())).thenReturn(posts);
+        Page<PostDetail> list = postService.search(searchRequest);
 
         // then
-        assertThat(postList).hasSize(2);
-        assertThat(postList).extracting("title").doesNotContain("오전의 포스트");
+        assertThat(list.getNumberOfElements()).isEqualTo(2);
+        assertThat(list.getContent()) // Page 객체에서 실제 데이터 리스트를 추출
+                .extracting("title")
+                .doesNotContain("오전의 포스트");
     }
 
     @Test
@@ -192,12 +196,12 @@ public class PostServiceTest {
         when(postRepository.findAllByOrderByCreatedAtDesc()).thenReturn(posts);
 
         // when
-        List<Post> postList = postService.searchList(searchRequest);
+        Page<PostDetail> postList = postService.search(searchRequest);
 
         // then
-        assertThat(postList).hasSize(2);
-        assertThat(postList.get(0).getId()).isEqualTo(post2.getId()); // 가장 최신 게시글
-        assertThat(postList.get(1).getId()).isEqualTo(post1.getId()); // 그 다음 게시글
+        assertThat(postList.getNumberOfElements()).isEqualTo(2);
+        assertThat(postList.getContent().get(0).getPostId()).isEqualTo(post2.getId()); // 가장 최신 게시글
+        assertThat(postList.getContent().get(1).getPostId()).isEqualTo(post1.getId()); // 그 다음 게시글
     }
 
     @Test

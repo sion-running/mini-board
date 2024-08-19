@@ -1,12 +1,13 @@
 package com.wanted.august.service;
 
 import com.wanted.august.model.Post;
+import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
 import com.wanted.august.model.response.PostDetailResponse;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface PostService {
 
     String update(PostUpdateRequest request, String userName);
 
-    List<Post> searchList(SearchRequest request);
+    Page<PostDetail> search(SearchRequest request);
 
     void delete(Long postId, Boolean isSoftDelete, String userName);
 

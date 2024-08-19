@@ -1,5 +1,6 @@
 package com.wanted.august.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wanted.august.model.UserRole;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = "deleted_at is NULL")
+//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UserEntity extends BaseEntity {
 
     @Id
