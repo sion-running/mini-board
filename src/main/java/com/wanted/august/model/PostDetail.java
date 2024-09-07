@@ -10,18 +10,17 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class PostDetail {
-//    private PostEntity post;
     private Long postId;
-    private String userName;
+    private User user;
     private String title;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private long viewCount;
+    private Integer viewCount;
 
-    public PostDetail(Long postId, String userName, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt, long viewCount) {
+    public PostDetail(Long postId, User user, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt, Integer viewCount) {
         this.postId = postId;
-        this.userName = userName;
+        this.user = user;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;

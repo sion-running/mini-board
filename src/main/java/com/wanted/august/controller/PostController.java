@@ -1,7 +1,6 @@
 package com.wanted.august.controller;
 
 import com.wanted.august.model.Post;
-import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.request.PostCreateRequest;
 import com.wanted.august.model.request.PostUpdateRequest;
 import com.wanted.august.model.request.SearchRequest;
@@ -39,8 +38,8 @@ public class PostController {
     }
 
     @GetMapping
-    public Response<Page<PostDetail>> search(@RequestBody SearchRequest request) {
-        Page<PostDetail> list = postService.search(request);
+    public Response<Page<Post>> search(@RequestBody SearchRequest request) {
+        Page<Post> list = postService.search(request);
         return Response.success(list);
     }
 
