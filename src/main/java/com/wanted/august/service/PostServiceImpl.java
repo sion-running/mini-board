@@ -4,7 +4,6 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
-import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
@@ -52,15 +51,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostDetail> search(SearchRequest request) {
+    public Page<Post> search(SearchRequest request) {
         Pageable pageable = PageRequest.of(request.getPageStart(), request.getPageSize(), getSortDetail(request)); // TODO sort type 문자열 리팩토링
         String title = request.getTitle();
 
         if (title == null || title.isBlank()) {
-            return postRepository.findPostDetailsWithViewCount(pageable);
+            return postRepository.findPostWithViewCount(pageable);
         }
 
-        return postRepository.findPostDetailsWithViewCountByTitle(pageable, title);
+        return postRepository.findPostWithViewCountByTitle(pageable, title);
     }
 
     @Override
