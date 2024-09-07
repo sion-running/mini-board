@@ -3,6 +3,7 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
+import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
@@ -231,6 +232,7 @@ public class PostServiceTest {
                 .id(1L)
                 .userName(userName)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         PostUpdateRequest request = PostUpdateRequest.builder()
@@ -372,12 +374,14 @@ public class PostServiceTest {
                 .id(1L)
                 .userName(loggedInUser)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         UserEntity postWriterEntity = UserEntity.builder()
                 .id(2L)
                 .userName(postWriter)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         PostUpdateRequest request = PostUpdateRequest.builder()
@@ -414,12 +418,14 @@ public class PostServiceTest {
                 .id(1L)
                 .userName(loggedInUser)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         UserEntity postWriterEntity = UserEntity.builder()
                 .id(2L)
                 .userName(postWriter)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         PostEntity entity = PostEntity.builder()
@@ -446,6 +452,7 @@ public class PostServiceTest {
                 .id(1L)
                 .userName(userName)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         PostEntity entity = PostEntity.builder()
@@ -472,6 +479,7 @@ public class PostServiceTest {
                 .id(1L)
                 .userName(userName)
                 .password("encodedPassword")
+                .role(UserRole.USER)
                 .build();
 
         PostEntity entity = PostEntity.builder()
