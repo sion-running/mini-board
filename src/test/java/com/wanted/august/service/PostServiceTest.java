@@ -3,7 +3,6 @@ package com.wanted.august.service;
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Post;
-import com.wanted.august.model.PostDetail;
 import com.wanted.august.model.entity.PostEntity;
 import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.model.request.PostCreateRequest;
@@ -146,32 +145,34 @@ public class PostServiceTest {
 
         List<PostEntity> posts = Arrays.asList(post2, post3);
 
-        PostDetail postDetail1 = new PostDetail(
+        Post postDetail1 = new Post(
                 1L, // id
                 "user1234", // userName
                 "오후의 포스트1", // title
                 "content1", // content
+                5L, // viewCount
                 LocalDateTime.now(), // createdAt
                 LocalDateTime.now(), // updatedAt
-                5 // viewCount
+                null // deletedAt
         );
 
-        PostDetail postDetail2 = new PostDetail(
+        Post postDetail2 = new Post(
                 2L, // id
                 "user1234", // userName
                 "오후의 포스트2", // title
                 "content2", // content
+                3L, // viewCount
                 LocalDateTime.now(), // createdAt
                 LocalDateTime.now(), // updatedAt
-                3 // viewCount
+                null
         );
 
-        List<PostDetail> postDetails = Arrays.asList(postDetail1, postDetail2);
-        Page<PostDetail> page = new PageImpl<>(postDetails, Pageable.ofSize(10), postDetails.size());
+        List<Post> postDetails = Arrays.asList(postDetail1, postDetail2);
+        Page<Post> page = new PageImpl<>(postDetails, Pageable.ofSize(10), postDetails.size());
 
         // when
-        when(postRepository.findPostDetailsWithViewCountByTitle(any(Pageable.class), eq(searchRequest.getTitle()))).thenReturn(page);
-        Page<PostDetail> list = postService.search(searchRequest);
+        when(postRepository.findPostWithViewCountByTitle(any(Pageable.class), eq(searchRequest.getTitle()))).thenReturn(page);
+        Page<Post> list = postService.search(searchRequest);
 
         // then
         assertThat(list.getNumberOfElements()).isEqualTo(2);
@@ -185,39 +186,41 @@ public class PostServiceTest {
         // given
         SearchRequest searchRequest = SearchRequest.builder().pageSize(10).pageStart(0).pageEnd(2).direction("DESC").build();
 
-        PostDetail postDetail1 = new PostDetail(
+        Post postDetail1 = new Post(
                 1L, // id
                 "user1234", // userName
                 "title1", // title
                 "content1", // content
+                5L,
                 LocalDateTime.now().minusDays(1), // createdAt
                 LocalDateTime.now().minusDays(1), // updatedAt
-                5 // viewCount
+                null // viewCount
         );
 
-        PostDetail postDetail2 = new PostDetail(
+        Post postDetail2 = new Post(
                 2L, // id
                 "user1234", // userName
                 "title2", // title
                 "content2", // content
+                3L,
                 LocalDateTime.now(), // createdAt
                 LocalDateTime.now(), // updatedAt
-                3 // viewCount
+                null
         );
 
-        List<PostDetail> postDetails = Arrays.asList(postDetail2, postDetail1);
-        Page<PostDetail> page = new PageImpl<>(postDetails, Pageable.ofSize(10), postDetails.size());
+        List<Post> postDetails = Arrays.asList(postDetail2, postDetail1);
+        Page<Post> page = new PageImpl<>(postDetails, Pageable.ofSize(10), postDetails.size());
 
-        when(postRepository.findPostDetailsWithViewCount(any(Pageable.class))).thenReturn(page);
+        when(postRepository.findPostWithViewCount(any(Pageable.class))).thenReturn(page);
 
         // when
-        Page<PostDetail> postList = postService.search(searchRequest);
+        Page<Post> postList = postService.search(searchRequest);
 
         // then
-        verify(postRepository, times(1)).findPostDetailsWithViewCount(any(Pageable.class));
+        verify(postRepository, times(1)).findPostWithViewCount(any(Pageable.class));
         assertThat(postList.getNumberOfElements()).isEqualTo(2);
-        assertThat(postList.getContent().get(0).getPostId()).isEqualTo(2L); // 가장 최신 게시글
-        assertThat(postList.getContent().get(1).getPostId()).isEqualTo(1L); // 그 다음 게시글
+        assertThat(postList.getContent().get(0).getId()).isEqualTo(2L); // 가장 최신 게시글
+        assertThat(postList.getContent().get(1).getId()).isEqualTo(1L); // 그 다음 게시글
     }
 
     @Test
