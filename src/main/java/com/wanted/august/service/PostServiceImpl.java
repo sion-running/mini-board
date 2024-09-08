@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -30,6 +31,7 @@ public class PostServiceImpl implements PostService {
     private static final Integer LAST_ALLOWED_DAY_FOR_MODIFICATION = 9;
 
     @Override
+    @Transactional
     public Post create(PostCreateRequest request, String userName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(userName);
         PostEntity postEntity = PostEntity.toEntity(request, userEntity);
@@ -63,6 +65,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public String update(PostUpdateRequest request, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = findByPostIdOrElseThrow(request.getPostId());
@@ -88,6 +91,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void delete(Long postId, Boolean isSoftDelete, String loginUserName) {
         UserEntity userEntity = userService.findByUserNameOrElseThrow(loginUserName);
         PostEntity postEntity = findByPostIdOrElseThrow(postId);

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     // 회원가입
     @Override
+    @Transactional
     public User join(UserJoinRequest request) {
         userRepository.findByUserName(request.getUserName()).ifPresent(it -> {
             throw new AugustApplicationException(ErrorCode.DUPLICATE_USER_NAME);

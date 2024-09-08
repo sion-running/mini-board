@@ -6,6 +6,7 @@ import com.wanted.august.model.entity.UserEntity;
 import com.wanted.august.repository.PostViewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,6 +19,7 @@ public class PostViewServiceImpl implements PostViewService {
     private final UserService userService;
 
     @Override
+    @Transactional
     public PostViewEntity addCount(Long postId, String userName) {
         PostEntity postEntity = postService.findByPostIdOrElseThrow(postId);
         UserEntity userEntity = userService.findByUserNameOrElseThrow(userName);

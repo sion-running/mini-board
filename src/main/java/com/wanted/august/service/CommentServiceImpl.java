@@ -11,6 +11,7 @@ import com.wanted.august.model.request.CommentUpdateRequest;
 import com.wanted.august.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserService userService;
 
     @Override
+    @Transactional
     public Comment addComment(CommentCreateRequest request, String writerName) {
         // 존재하는 포스트인지 검증
         PostEntity postEntity = postService.findByPostIdOrElseThrow(request.getPostId());
@@ -42,6 +44,7 @@ public class CommentServiceImpl implements CommentService {
         return Comment.fromEntity(saved);
     }
 
+    @Transactional
     public Comment update(CommentUpdateRequest request, String writerName) {
         // 존재하는 포스트인지 검증
         PostEntity postEntity = postService.findByPostIdOrElseThrow(request.getPostId());
@@ -63,6 +66,7 @@ public class CommentServiceImpl implements CommentService {
         return Comment.fromEntity(saved);
     }
 
+    @Transactional
     public void delete(Long commentId, String writerName) {
         CommentEntity commentEntity = commentRepository.findById(commentId).orElseThrow(() -> new AugustApplicationException(ErrorCode.COMMENT_NOT_FOUND));
 
