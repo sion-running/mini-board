@@ -20,17 +20,4 @@ public class Response<T> {
     public static Response<Void> error(String resultCode) {
         return new Response<Void>(resultCode, null);
     }
-
-    public String toStream() {
-        if (result == null) {
-            return "{" +
-                    "\"resultCode\":" + "\"" + resultCode + "\"," +
-                    "\"result\":" + null +
-                    "}";
-        }
-        return "{" +
-                "\"resultCode\":" + "\"" + resultCode + "\"," +
-                "\"result\":" + "\"" + result + "\"," +
-                "}";
-    }
 }
