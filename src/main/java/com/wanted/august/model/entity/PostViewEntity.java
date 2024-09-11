@@ -10,7 +10,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Table(name = "post_view")
+@Table(name = "post_view",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_name"}))
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
