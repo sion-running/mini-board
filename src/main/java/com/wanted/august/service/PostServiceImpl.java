@@ -3,6 +3,8 @@ package com.wanted.august.service;
 
 import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
+import com.wanted.august.model.Notification;
+import com.wanted.august.model.NotificationType;
 import com.wanted.august.model.Post;
 import com.wanted.august.model.UserRole;
 import com.wanted.august.model.entity.PostEntity;
@@ -28,6 +30,8 @@ import java.time.temporal.ChronoUnit;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
+
     private static final Integer LAST_ALLOWED_DAY_FOR_MODIFICATION = 9;
 
     @Override
@@ -37,6 +41,8 @@ public class PostServiceImpl implements PostService {
         PostEntity postEntity = PostEntity.toEntity(request, userEntity);
 
         PostEntity saved = postRepository.save(postEntity);
+        notificationService.send(NotificationType.POST_CREATED, userName);
+
         return Post.fromEntity(saved);
     }
 
