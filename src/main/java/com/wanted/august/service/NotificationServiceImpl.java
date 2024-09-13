@@ -1,6 +1,8 @@
 package com.wanted.august.service;
 
 
+import com.wanted.august.exception.AugustApplicationException;
+import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.Notification;
 import com.wanted.august.model.NotificationType;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             return emitter;
         } catch (IOException e) {
-            log.error("전송중 에러", e);
-            throw new RuntimeException();
+            throw new AugustApplicationException(ErrorCode.NOTIFICATION_ERROR);
         }
     }
 

@@ -19,6 +19,7 @@ public enum ErrorCode {
     COMMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "User already has a comment on this post"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not found"),
     NO_PERMISSION_FOR_THE_COMMENT(HttpStatus.FORBIDDEN, "User does not have permission for this comment"),
+    NOTIFICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send notification to the user"),
 
     ;
 
