@@ -23,6 +23,9 @@ public class PostViewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "post_id")
     private Long postId;
+
+    @Column(name = "user_name")
     private String userName;
 }
