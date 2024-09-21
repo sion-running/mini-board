@@ -1,5 +1,7 @@
 package com.wanted.august.utils;
 
+import com.wanted.august.exception.AugustApplicationException;
+import com.wanted.august.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,11 +27,11 @@ public class JwtTokenUtil {
     }
 
     public Claims extractAllClaims(String token, String key) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey(key))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey(key))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
     }
 
     public String getUsername(String token) {

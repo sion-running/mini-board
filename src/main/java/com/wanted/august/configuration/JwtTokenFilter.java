@@ -1,8 +1,11 @@
 package com.wanted.august.configuration;
 
+import com.wanted.august.exception.AugustApplicationException;
+import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.User;
 import com.wanted.august.service.UserService;
 import com.wanted.august.utils.JwtTokenUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -49,15 +52,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             }
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null,
                     userDetails.getAuthorities()
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (RuntimeException e) {
-            chain.doFilter(request, response);
-            return;
+        } catch (Exception e) {
+            request.setAttribute(ErrorCode.INVALID_TOKEN.name(), ErrorCode.INVALID_TOKEN.getDesc());
         }
 
         chain.doFilter(request, response);

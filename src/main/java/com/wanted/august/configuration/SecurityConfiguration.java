@@ -1,15 +1,12 @@
 package com.wanted.august.configuration;
 
-import com.wanted.august.service.UserService;
-import com.wanted.august.utils.JwtTokenUtil;
+import com.wanted.august.exception.AuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -32,9 +29,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-//                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new AuthenticationEntryPoint())
+                .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
