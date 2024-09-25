@@ -1,11 +1,10 @@
 package com.wanted.august.utils;
 
-import com.wanted.august.exception.AugustApplicationException;
-import com.wanted.august.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtTokenUtil {
     @Value("${jwt.secret-key}")
@@ -23,7 +23,7 @@ public class JwtTokenUtil {
 
     public Boolean validate(String token, String userName) {
         String usernameByToken = getUsername(token);
-        return usernameByToken.equals(userName) && !isTokenExpired(token, secretKey);
+        return usernameByToken.equals(userName) && !isTokenExpired(token);
     }
 
     public Claims extractAllClaims(String token, String key) {
@@ -43,24 +43,28 @@ public class JwtTokenUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Boolean isTokenExpired(String token, String key) {
-        Date expiration = extractAllClaims(token, key).getExpiration();
+    public Boolean isTokenExpired(String token) {
+        Date expiration = extractAllClaims(token, secretKey).getExpiration();
         return expiration.before(new Date());
     }
 
     public String generateAccessToken(String username) {
-        return doGenerateToken(username, expiredTimeMs, secretKey);
-    }
-
-    private String doGenerateToken(String username, long expireTime, String key) {
         Claims claims = Jwts.claims();
         claims.put("username", username);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expireTime))
-                .signWith(getSigningKey(key), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs))
+                .signWith(getSigningKey(secretKey), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken() {
+        return Jwts.builder()
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs * 7))
+                .signWith(getSigningKey(secretKey), SignatureAlgorithm.HS256)
                 .compact();
     }
 }

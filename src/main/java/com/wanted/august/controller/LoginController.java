@@ -1,5 +1,6 @@
 package com.wanted.august.controller;
 
+import com.wanted.august.model.Token;
 import com.wanted.august.model.request.UserLoginRequest;
 import com.wanted.august.model.response.Response;
 import com.wanted.august.service.UserService;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final UserService userService;
     @PostMapping
-    public Response<String> login(@RequestBody UserLoginRequest request) {
-        String token = userService.login(request);
+    public Response<Token> login(@RequestBody UserLoginRequest request) {
+        Token token = userService.login(request);
         return Response.success(token);
     }
 }

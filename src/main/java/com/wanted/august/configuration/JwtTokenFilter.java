@@ -1,11 +1,9 @@
 package com.wanted.august.configuration;
 
-import com.wanted.august.exception.AugustApplicationException;
 import com.wanted.august.exception.ErrorCode;
 import com.wanted.august.model.User;
 import com.wanted.august.service.UserService;
 import com.wanted.august.utils.JwtTokenUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -32,10 +30,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain chain)
-            throws ServletException, IOException {
+                                    FilterChain chain) throws ServletException, IOException {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String token;
+        final String requestURI = request.getRequestURI();
+
+        // 허용된 경로에서 JWT 검증을 건너뛰기
+        if (requestURI.equals("/user/join") || requestURI.equals("/user/login") || requestURI.equals("/token/refresh")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         try {
             if (header == null || !header.startsWith("Bearer ")) {
                 log.error("Authorization Header does not start with Bearer {}", request.getRequestURI());

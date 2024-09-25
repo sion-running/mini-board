@@ -49,10 +49,13 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (IOException e) {
             throw new AugustApplicationException(ErrorCode.NOTIFICATION_ERROR);
         }
+
+        // TODO --- 1. 데이터베이스에 알람 전송 이력 저장
+        // TODO --- 2. 이전에 미전송한 알람 확인 후 전송하기
     }
 
     public String getEventId(String userName) {
-// TODO refactoring --- return userName + "_" + System.currentTimeMillis();
+    // TODO refactoring --- return userName + "_" + System.currentTimeMillis();
         return userName;
     }
 }
